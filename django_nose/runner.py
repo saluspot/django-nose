@@ -432,6 +432,14 @@ def _should_create_database(connection):
     # to keep making people explicitly saying REUSE_DB if they want to reuse
     # the DB.
 
+    # Connections are cached by some backends, if other code has connected
+    # to the database previously under a different database name the
+    # cached connection will be used and no exception will be raised.
+    # Setting to null here solves that problem.
+    # https://github.com/django-nose/django-nose/pull/101/files
+    # https://github.com/django-nose/django-nose/issues/76
+    connection.connection = None
+
     if not _can_support_reuse_db(connection):
         return True
 
